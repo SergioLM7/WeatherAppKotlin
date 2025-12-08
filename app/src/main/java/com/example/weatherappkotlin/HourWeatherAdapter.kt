@@ -26,7 +26,7 @@ class HourWeatherAdapter (
 
         val view = LayoutInflater
             .from(parent.context) //contexto de la clase padre
-            .inflate(resource = R.layout.activity_hour, root = parent, attachToRoot = false)
+            .inflate(R.layout.activity_hour, parent, false)
 
         return VH(view)
     }
@@ -41,6 +41,17 @@ class HourWeatherAdapter (
         holder.tvTemp.text = "${item.tempC}ºC"
     }
 
+    //Cuántos elementos van a aparecer en la vista
+    override fun getItemCount(): Int = items.size
+
+    //Me permite reemplazar la lista que hayamos cargado previamente
+    //1º limpiará la lista; 2ºmetemos todos los items nuevos en la lista
+    //3º notificamos que ha habido un cambio en los datos y así se vuelve a inflar nuestra vista
+    fun summitList(newItems:List<HourWeather>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 
 
 

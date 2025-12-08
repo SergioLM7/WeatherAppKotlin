@@ -6,6 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.weatherappkotlin.model.HourWeather
 
 //Los dos puntos implican que la clase "extiende de" AppCompactActivity (los paréntesis son el constructor vacío)
 class MainActivity : AppCompatActivity() {
@@ -99,9 +102,25 @@ class MainActivity : AppCompatActivity() {
         val btnProcesar = findViewById<Button>(R.id.btnProcesar)
         val tvResultado = findViewById<TextView>(R.id.tvResultado)
         val btnIrSegunda = findViewById<Button>(R.id.btnSecondActivity)
+        val btnCargar = findViewById<Button>(R.id.btnLoadPrediction)
+        val rv = findViewById<RecyclerView>(R.id.rvHours)
 
         //Si cambiamos cualquier propiedad de estas variables, se cambia la propiedad del xml
         tvTitulo.text = "KOTLIN DEMO"
+
+        val adapter = HourWeatherAdapter()
+        //EL gestor de nuestro rv será un LinearLayout y se va a cargar en el contexto de nuestro Main
+        rv.layoutManager = LinearLayoutManager(this)
+        rv.adapter = adapter
+        btnCargar.setOnClickListener {
+            val datos = listOf(
+                HourWeather("9:00", 18, R.drawable.ic_nublado),
+                HourWeather("10:00", 21, R.drawable.ic_nublado),
+                HourWeather("12:00", 22, R.drawable.ic_sol),
+                HourWeather("14:00", 21, R.drawable.ic_nublado))
+
+            adapter.summitList(datos)
+        }
 
         btnIrSegunda.setOnClickListener {
             val textoEntrada = etEntrada.text.toString().trim()
