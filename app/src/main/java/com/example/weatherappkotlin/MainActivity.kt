@@ -103,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         val tvResultado = findViewById<TextView>(R.id.tvResultado)
         val btnIrSegunda = findViewById<Button>(R.id.btnSecondActivity)
         val btnCargar = findViewById<Button>(R.id.btnLoadPrediction)
+        //Otra forma de enlazar un elemento de una vista
+        val btnGPS: Button = findViewById(R.id.btnGPS)
         val rv = findViewById<RecyclerView>(R.id.rvHours)
 
         //Si cambiamos cualquier propiedad de estas variables, se cambia la propiedad del xml
@@ -166,6 +168,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             tvResultado.text = salida
+        }
+
+        btnGPS.setOnClickListener {
+            //La forma de lanzar una Activity es a través de un intent
+            val intent = Intent(this, LocationActivity::class.java)
+            startActivity(intent)
         }
 
 
