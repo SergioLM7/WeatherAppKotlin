@@ -6,11 +6,17 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.osmdroid.api.IMapController
+import org.osmdroid.config.Configuration
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 class LocationActivity: AppCompatActivity(), LocationListener {
 
@@ -18,8 +24,15 @@ class LocationActivity: AppCompatActivity(), LocationListener {
     //pero te comprometes a inicializarla después
     private lateinit var tvLatLong: TextView
     private lateinit var tvStatus: TextView
+    private lateinit var btnVolverLocation: Button
+
     //Intermediario entre el programa y el GPS
     private lateinit var locationManager: LocationManager
+
+    // Mapa de OpenStreetMap (osmdroid)
+    private lateinit var mapView: MapView
+    private lateinit var mapMarker: Marker
+    private lateinit var mapController: IMapController
 
     //Cuando hacemos una petición al SO de Android para que nos envíe datos de un sensor
     // va a una pila de pticiones y se asigna un código de petición
@@ -32,16 +45,43 @@ class LocationActivity: AppCompatActivity(), LocationListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Configuración básica de osmdroid: user agent (recomendado)
+        Configuration.getInstance().userAgentValue = packageName
+
         setContentView(R.layout.activity_location)
 
         tvLatLong = findViewById(R.id.tvLatLong)
         tvStatus = findViewById(R.id.tvStatus)
+        btnVolverLocation = findViewById<Button>(R.id.btnVolverLocation)
+
+        // Vinculamos el MapView del layout
+        mapView = findViewById(R.id.mapView)
+        // Permitimos zoom con dos dedos, etc.
+        mapView.setMultiTouchControls(true)
+
+        // Establecemos un zoom inicial para el mapa
+        mapController = mapView.controller
+        mapController.setZoom(16.0)
+        // Centramos en una posición inicial (por ejemplo, Madrid)
+        val startPoint = GeoPoint(40.4168, -3.7038)
+        mapController.setCenter(startPoint)
+
+        // Creamos un marcador inicial
+        mapMarker = Marker(mapView)
+        mapMarker.position = startPoint
+        mapMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        mapMarker.title = "Tu posición"
+        mapView.overlays.add(mapMarker)
 
         //Inicializamos el servicio de localización
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
         //Comprobar permisos
         checkPermissionsAndStart()
+
+        btnVolverLocation.setOnClickListener {
+            finish()
+        }
     }
 
 
@@ -103,6 +143,18 @@ class LocationActivity: AppCompatActivity(), LocationListener {
         }
         tvStatus.text = "Localización recibida"
 
+        // Convertimos la localización a GeoPoint de osmdroid
+        val newPoint = GeoPoint(lat, lon)
+        // Movemos el mapa al nuevo punto
+        mapController = mapView.controller
+        mapController.setCenter(newPoint)
+
+        // Movemos el marcador a la nueva posición
+        mapMarker.position = newPoint
+
+        // Forzamos repintado del mapa
+        mapView.invalidate()
+
         //Mensaje tipo toast
         Toast.makeText(this, "Localización recibida", Toast.LENGTH_SHORT).show()
     }
@@ -125,12 +177,18 @@ class LocationActivity: AppCompatActivity(), LocationListener {
         }
     }
 
+    //Usamos estos métodos del ciclo de vida para revisar los permisos y parar la actualización del GPS
+    //porque son más eficientes a nivel de batería y más robustos
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume() // Necesario para el mapa
+        checkPermissionsAndStart()
+    }
 
-    //Cuando la Activity se destruye, paramos el GPS
-    //Por default, solo pararía la Activity y cerraría la ventana (NO los sensores)
-    override fun onDestroy() {
-        super.onDestroy()
-        locationManager.removeUpdates { this }
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause() // Necesario para el mapa
+        locationManager.removeUpdates(this)
     }
 
 }

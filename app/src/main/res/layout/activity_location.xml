@@ -32,4 +32,21 @@
         android:textSize="20sp"
         android:paddingBottom="16dp"
         />
+
+    <!--MapView de osmdroid (OpenStreetMap)
+        - Ocupa el ancho total
+    - Usa weight=1 para crecer ocupando el espacio restante-->
+    <org.osmdroid.views.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btnVolverLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="Volver" />
+
 </LinearLayout>
