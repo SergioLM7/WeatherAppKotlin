@@ -22,6 +22,7 @@
         </activity>
             <activity android:name=".SecondActivity" android:exported="false" />
             <activity android:name=".LocationActivity" android:exported="false" />
+            <activity android:name=".AccelerometerActivity" android:exported="false" />
     </application>
 
 </manifest>

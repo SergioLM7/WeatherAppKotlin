@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         val btnCargar = findViewById<Button>(R.id.btnLoadPrediction)
         //Otra forma de enlazar un elemento de una vista
         val btnGPS: Button = findViewById(R.id.btnGPS)
+        val btnAccelerometer: Button = findViewById(R.id.btnAccelerometer)
         val rv = findViewById<RecyclerView>(R.id.rvHours)
 
         //Si cambiamos cualquier propiedad de estas variables, se cambia la propiedad del xml
@@ -176,6 +177,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        btnAccelerometer.setOnClickListener {
+            val intent = Intent(this, AccelerometerActivity::class.java)
+            startActivity(intent)
+        }
 
     }
 
